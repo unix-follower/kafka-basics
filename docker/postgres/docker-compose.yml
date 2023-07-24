@@ -1,0 +1,25 @@
+volumes:
+  data:
+
+networks:
+  kafka-basics-bridge:
+    external: true
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    hostname: postgres
+    restart: "no"
+    networks:
+      kafka-basics-bridge:
+        ipv4_address: 192.168.9.2
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MESSENGER_SVC_USER: ${MESSENGER_SVC_USER}
+      MESSENGER_SVC_PASSWORD: ${MESSENGER_SVC_PASSWORD}
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d/
+      - data:/var/lib/postgresql

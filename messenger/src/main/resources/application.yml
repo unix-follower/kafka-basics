@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: messenger
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:}
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/messenger}
+    username: ${SPRING_DATASOURCE_USERNAME:messenger_svc}
+    password: ${SPRING_DATASOURCE_PASSWORD:messenger_svc}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:100}
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:2}
+      pool-name: ${spring.application.name}-ds-pool
+      transaction-isolation: TRANSACTION_READ_COMMITTED
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+  kafka:
+    bootstrapServers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    clientId: ${spring.application.name}
+#    producer:
+#      transaction-id-prefix: tx-
+
+server:
+  port: ${SERVER_PORT:8081}
+  shutdown: graceful
+
+logging:
+  level:
+    org.apache.kafka: DEBUG
+    org.zalando.logbook: TRACE
+    org.springframework.orm.jpa: DEBUG
+    org.springframework.transaction: DEBUG
+
+logbook:
+  exclude:
+    - /actuator/**
+
+app:
+  kafka:
+    messenger-topic: ${APP_KAFKA_MESSENGER_TOPIC:messenger}
+    non-transactional-clientId: non-transactional-${spring.application.name}

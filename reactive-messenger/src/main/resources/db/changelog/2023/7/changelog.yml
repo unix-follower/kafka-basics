@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2023/7/1-init.sql
+      author: artsem_nikitsenka@epam.com
+      changes:
+        - sqlFile:
+            path: 1-init.sql
+            relativeToChangelogFile: true

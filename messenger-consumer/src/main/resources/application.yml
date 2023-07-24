@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: messenger-consumer
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:}
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    client-id: ${spring.application.name}
+    consumer:
+      group-id: ${spring.application.name}-group
+      enable-auto-commit: ${SPRING_KAFKA_CONSUMER_ENABLE_AUTO_COMMIT:false}
+#       auto.commit.interval.ms Default value is 5000 ms = 5 sec
+      auto-commit-interval: ${SPRING_KAFKA_CONSUMER_AUTO_COMMIT_INTERVAL:5s}
+      auto-offset-reset: ${SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET:earliest} # Values: earliest, latest
+      max-poll-records: ${SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_RECORDS:200} # Default value is 500
+      isolation-level: read_committed # Default value is read_uncommitted
+      properties:
+        # 30 sec. Default value is 300000 ms = 300 sec = 5 min
+        max.poll.interval.ms: ${SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_INTERVAL_MS:30000}
+    retry:
+      topic:
+        enabled: ${SPRING_KAFKA_RETRY_TOPIC_ENABLED:true}
+        attempts: ${SPRING_KAFKA_RETRY_TOPIC_ATTEMPTS:3} # Default value is 3
+        multiplier: ${SPRING_KAFKA_RETRY_TOPIC_MULTIPLIER:2} # Default value is 0
+    listener:
+      type: ${SPRING_KAFKA_LISTENER_TYPE:SINGLE} # Values: SINGLE, BATCH
+      # Values: BATCH, RECORD, COUNT, TIME, COUNT_TIME, MANUAL, MANUAL_IMMEDIATE
+      ack-mode: ${SPRING_KAFKA_LISTENER_ACK_MODE:RECORD} # Default ack mode is BATCH
+      ack-count: ${SPRING_KAFKA_LISTENER_ACK_COUNT:1} # Default value is 1
+      ack-time: ${SPRING_KAFKA_LISTENER_ACK_TIME:5000ms} # Default value is 5000 ms = 5 sec
+
+server:
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+
+logging:
+  level:
+    org.apache.kafka: DEBUG
+    org.springframework.kafka.listener: DEBUG
+    org.zalando.logbook: TRACE
+
+logbook:
+  exclude:
+    - /actuator/**
+
+app:
+  kafka:
+    messenger-topic: ${APP_KAFKA_MESSENGER_TOPIC:messenger}
+    retry:
+      delay-ms: ${APP_KAFKA_RETRY_DELAY_MS:10000} # 10s
+    error-handler-attempts: ${APP_KAFKA_ERROR_HANDLER_ATTEMPTS:0}
+    error-handler-interval: ${APP_KAFKA_ERROR_HANDLER_INTERVAL:5s}
